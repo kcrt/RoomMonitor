@@ -1,0 +1,11 @@
+
+zsh 用
+
+for i in *.mp3; do
+    ffmpeg -y -i "$i" -vn -f s16le -acodec pcm_s16le -ac 1 -ar 44100 "${i:r}.raw"
+
+    echo '// PCM 16bit LE' > "${i:r}.h"
+    echo "const unsigned char SOUND_${i:r:u}[] PROGMEM = {" >> "${i:r}.h"
+    od -tx1 -An -v "${i:r}.raw" | sed -e 's/^ *//g' | sed -e 's/  /, 0x/g' | sed -e 's/^/  0x/' | sed -e 's/$/, /' | sed -e 's/0x,//' >> "${i:r}.h"
+    echo '};' >> "${i:r}.h";
+done
